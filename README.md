@@ -83,7 +83,7 @@ Messages are stored flat, each with a `parentId` and From/To/CC. Branches are ne
 - The open branch is the main line; the other branch is an indented card at the fork. Every message in the view is listed, including ones folded into a count.
 - Clicking a timeline message reveals it in the thread, opens it, and scrolls to it. `App` owns which messages are open and revealed, so both panels read the same state.
 - Notes come from comparing each message with the one it replies to: "Private conversation with Bear" when the audience narrows to you and one other person, "Adam added" / "Adam removed", and "Subject changed to …".
-- Clicking the "Activity" title collapses the panel to a 96px rail of avatars and activity icons, with a « button at the top to expand it again. The branch card becomes a fork icon on the line. Hovering an icon shows what it stands for.
+- Clicking the "Activity" title collapses the panel to a 64px rail of avatars and activity icons, with a « button at the top to expand it again. The branch card becomes a fork icon on the line. Hovering an icon shows what it stands for.
 
 ## Design notes
 
