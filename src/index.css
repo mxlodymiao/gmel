@@ -2,8 +2,11 @@
 
 /* Design tokens from the Figma frames. Spacing uses Tailwind's default 4px scale. */
 @theme {
+  /* Like Gmail: Roboto for the interface, Arial for email bodies, and Google Sans
+     for subjects, monograms and the sidebar section titles */
   --font-sans: 'Roboto', system-ui, sans-serif;
-  --font-display: 'Google Sans Flex', 'Roboto', sans-serif;
+  --font-google-sans: 'Google Sans Flex', 'Roboto', sans-serif;
+  --font-email: Arial, Helvetica, sans-serif;
 
   /* Surfaces */
   --color-canvas: #f7f8fc;
@@ -13,6 +16,7 @@
   --color-nav-active: #d3e2fd;
   --color-chip-fill: #eff4f8;
   --color-hover: #f2f5fa;
+  --color-card-hover: #f8f9fa;
 
   /* Text */
   --color-ink: #1f1f1f;
@@ -27,6 +31,13 @@
   --color-divider: #edeff1;
   --color-toolbar-divider: #eceff1;
   --color-button-border: #757575;
+
+  /* Activity sidebar */
+  --color-panel-border: #e1e7ed;
+  --color-ink-section: #3c4043;
+  --color-subtle: #9aa0a6;
+  --color-ink-soft: #80868b; /* sidebar snippets */
+  --color-line: #dadce0;
 
   /* Type scale */
   --text-headline: 22px;
@@ -49,6 +60,18 @@
   --text-chip: 10px;
   --text-chip--line-height: 18px;
   --text-chip--letter-spacing: 0.15px;
+
+  --text-panel-title: 14px;
+  --text-panel-title--line-height: 20px;
+  --text-label: 13px;
+  --text-label--line-height: 18px;
+  --text-label--letter-spacing: 0.195px;
+  --text-snippet: 12px;
+  --text-snippet--line-height: 16px;
+  --text-snippet--letter-spacing: 0.18px;
+  --text-caption: 11px;
+  --text-caption--line-height: 16px;
+  --text-caption--letter-spacing: 0.165px;
 
   /* Radii */
   --radius-card: 16px;

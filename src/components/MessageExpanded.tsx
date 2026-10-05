@@ -59,14 +59,14 @@ export function MessageExpanded({
           type="button"
           aria-expanded
           onClick={onCollapse}
-          className={`focus-ring clickable-row hover:bg-hover ${headerClass}`}
+          className={`focus-ring clickable-row ${headerClass}`}
         >
           {header}
         </button>
       ) : (
         <div className={`w-full ${headerClass}`}>{header}</div>
       )}
-      <p className="min-h-[49px] pl-14 text-body whitespace-pre-wrap text-ink">{message.body}</p>
+      <p className="min-h-[49px] pl-14 font-email text-body whitespace-pre-wrap text-ink">{message.body}</p>
     </article>
   );
 }

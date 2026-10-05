@@ -14,7 +14,7 @@ const plural = (n: number, unit: string) => `${n} ${unit}${n === 1 ? '' : 's'} a
 
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 
-// Gmail style: "8:58 AM (10 minutes ago)" today, "Oct 3, 2026, 6:06 PM (1 day ago)" before
+// Gmail style: "3:16 PM (26 minutes ago)" today, "Sep 4, 2026, 9:12 AM (6 days ago)" before
 export function formatSentAt(iso: string, now = NOW): string {
   const sent = new Date(iso);
   const days = Math.round((startOfDay(now) - startOfDay(sent)) / 86_400_000);
@@ -23,6 +23,13 @@ export function formatSentAt(iso: string, now = NOW): string {
   const minutes = Math.max(0, Math.round((now.getTime() - sent.getTime()) / 60_000));
   const ago = minutes < 60 ? plural(minutes, 'minute') : plural(Math.floor(minutes / 60), 'hour');
   return `${timeOnly.format(sent)} (${ago})`;
+}
+
+const dayOnly = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
+
+// Just the date, for the sidebar timeline: "Sep 4"
+export function formatShortDate(iso: string): string {
+  return dayOnly.format(new Date(iso));
 }
 
 // "to me, Bear"

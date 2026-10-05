@@ -2,27 +2,21 @@ import { ME, people } from '../data/thread';
 import type { Branch, Chip, Message } from '../types';
 import { audienceOf, sameAudience } from './branches';
 
-// Other people alphabetically, "me" always last
-function namesFor(audience: string[]): string[] {
-  const others = audience
+// Everyone else in an audience, alphabetically. You're always on your own
+// thread, so labels leave you out: "Visible to Adam, Bear"
+export function namesFor(audience: string[]): string[] {
+  return audience
     .filter((id) => id !== ME)
     .map((id) => people[id].name)
     .sort();
-  return audience.includes(ME) ? [...others, 'me'] : others;
-}
-
-// What goes before the i-th name: "Adam, Bear & me" (no comma before "&")
-export function separatorBefore(index: number, count: number): string {
-  if (index === 0) return '';
-  return index === count - 1 ? ' & ' : ', ';
 }
 
 export function joinNames(names: string[]): string {
-  return names.map((name, i) => separatorBefore(i, names.length) + name).join('');
+  return names.join(', ');
 }
 
 export function chipText(chip: Chip): string {
-  return `${chip.lead} ${joinNames(chip.names)}`;
+  return `${chip.lead} ${joinNames(chip.names)}`.trim();
 }
 
 /**
@@ -38,8 +32,8 @@ export function messageChip(message: Message, branch: Branch, main: Branch): Chi
   if (!differsFromMain && !differsFromBranch) return null;
 
   const names = namesFor(audience);
-  if (names.length === 1) return { lead: 'Only visible to', names };
-  if (names.length === 2) return { lead: 'Private conversation between', names };
+  if (names.length === 0) return { lead: 'Only visible to you', names };
+  if (names.length === 1) return { lead: 'Private conversation with', names };
   return { lead: 'Visible to', names };
 }
 

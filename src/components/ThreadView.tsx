@@ -1,6 +1,6 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import { icons } from '../assets/icons';
-import type { MessageEntry, ThreadItem, ThreadViewModel } from '../lib/threadView';
+import { foldedMessages, type MessageEntry, type ThreadItem, type ThreadViewModel } from '../lib/threadView';
 import { CollapsedCount } from './CollapsedCount';
 import { MessageCollapsed } from './MessageCollapsed';
 import { MessageExpanded } from './MessageExpanded';
@@ -14,24 +14,28 @@ type Row =
   | Extract<ThreadItem, { type: 'subjectChange' | 'preview' }>;
 
 /**
- * Renders one branch. Expand/collapse state lives here and resets when the view changes.
+ * Renders one branch. Which messages are open and which counts are revealed is
+ * owned by App, so the sidebar timeline can stay in sync with it.
  * `focusCardFor` puts keyboard focus on that branch's card link after switching views.
  */
 export function ThreadView({
   view,
+  expanded,
+  revealed,
+  onToggle,
+  onReveal,
   onOpenBranch,
   focusCardFor,
 }: {
   view: ThreadViewModel;
+  expanded: Set<string>;
+  revealed: Set<string>;
+  onToggle: (messageId: string) => void;
+  onReveal: (countKey: string) => void;
   onOpenBranch: (branchId: string) => void;
   focusCardFor?: string;
 }) {
   const lastId = lastMessageId(view.items);
-  const [expanded, setExpanded] = useState(
-    () =>
-      new Set(view.items.flatMap((i) => (i.type === 'message' && i.initiallyExpanded ? [i.entry.message.id] : []))),
-  );
-  const [revealed, setRevealed] = useState<Set<string>>(new Set());
 
   // Toggling swaps one button for another, so move focus to the new one
   const containerRef = useRef<HTMLDivElement>(null);
@@ -48,26 +52,23 @@ export function ThreadView({
   }, [focusCardFor]);
 
   const toggle = (id: string) => {
-    setExpanded((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    onToggle(id);
     pendingFocus.current = id;
   };
 
-  const reveal = (key: string, firstId: string) => {
-    setRevealed((prev) => new Set(prev).add(key));
-    pendingFocus.current = firstId;
+  const reveal = (key: string) => {
+    onReveal(key);
+    pendingFocus.current = key; // the key is the first hidden message's id
   };
 
   const rows: Row[] = view.items.flatMap((item): Row[] => {
     if (item.type === 'message') return [{ type: 'message', entry: item.entry, isLast: item.entry.message.id === lastId }];
     if (item.type !== 'collapsedCount') return [item];
-    const key = item.entries[0].message.id;
-    if (!revealed.has(key)) return [{ type: 'count', key, entries: item.entries }];
-    return item.entries.map((entry) => ({ type: 'message', entry, isLast: false, wasHidden: true }));
+    const { key } = item;
+    if (!revealed.has(key)) return [{ type: 'count', key, entries: foldedMessages(item.items) }];
+    return item.items.map((folded) =>
+      folded.type === 'message' ? { type: 'message', entry: folded.entry, isLast: false, wasHidden: true } : folded,
+    );
   });
 
   const isOpen = (row: Row | undefined) => row?.type === 'message' && expanded.has(row.entry.message.id);
@@ -99,7 +100,7 @@ export function ThreadView({
       case 'message': {
         const { message } = row.entry;
         return (
-          <div data-message-id={message.id}>
+          <div data-message-id={message.id} className="scroll-mt-4">
             {expanded.has(message.id) ? (
               <MessageExpanded
                 message={message}
@@ -113,7 +114,7 @@ export function ThreadView({
         );
       }
       case 'count':
-        return <CollapsedCount count={row.entries.length} onReveal={() => reveal(row.key, row.key)} />;
+        return <CollapsedCount count={row.entries.length} onReveal={() => reveal(row.key)} />;
       case 'subjectChange':
         return <SubjectHeading subject={row.subject} />;
       case 'preview':

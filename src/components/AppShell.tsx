@@ -10,10 +10,12 @@ import { Icon } from './Icon';
  */
 export function AppShell({
   toolbar,
+  sidebar,
   children,
   scrollRef,
 }: {
   toolbar: ReactNode;
+  sidebar?: ReactNode;
   children: ReactNode;
   scrollRef?: Ref<HTMLDivElement>;
 }) {
@@ -25,19 +27,22 @@ export function AppShell({
       <Header />
       <div className="flex min-h-0 flex-1 pr-4 pb-5">
         <Sidebar />
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-card bg-surface">
-          <div
-            className={`shrink-0 border-b px-4 pt-4 pb-4 transition-colors ${scrolled ? 'border-divider' : 'border-transparent'}`}
-          >
-            {toolbar}
+        <main className="flex min-w-0 flex-1 overflow-hidden rounded-card bg-surface">
+          <div className="flex min-w-0 flex-1 flex-col">
+            <div
+              className={`shrink-0 border-b px-4 pt-4 pb-4 transition-colors ${scrolled ? 'border-divider' : 'border-transparent'}`}
+            >
+              {toolbar}
+            </div>
+            <div
+              ref={scrollRef}
+              onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
+              className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20"
+            >
+              {children}
+            </div>
           </div>
-          <div
-            ref={scrollRef}
-            onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
-            className="min-h-0 flex-1 overflow-y-auto px-4 pt-4 pb-20"
-          >
-            {children}
-          </div>
+          {sidebar}
         </main>
       </div>
     </div>
@@ -46,15 +51,16 @@ export function AppShell({
 
 function Header() {
   return (
-    <header className="flex items-center gap-[83px] pt-2 pr-[18px] pb-2.5 pl-6">
-      <div className="flex items-center gap-4">
+    <header className="flex items-center pt-2 pr-[18px] pb-2.5 pl-6">
+      {/* Same width as the sidebar (minus padding), so search lines up with the email card */}
+      <div className="flex w-[232px] shrink-0 items-center gap-4">
         <Icon src={icons.menu} size={24} />
         <div className="flex items-center gap-2">
           {/* The logo PNG is a sprite; only its left 34px is the mark */}
           <div className="relative h-10 w-[34px] overflow-hidden">
             <img src={logo} alt="" className="absolute top-0 left-0 h-full w-[320.59%] max-w-none" />
           </div>
-          <span className="font-display text-logo text-ink">Gmel</span>
+          <span className="text-logo text-ink">Gmel</span>
         </div>
       </div>
 

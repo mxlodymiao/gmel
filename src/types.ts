@@ -1,4 +1,7 @@
-export type Person = { id: string; name: string; email: string; avatar: string };
+// A photo, or a Google-style monogram (first letter on a colored circle)
+export type Avatar = { src: string } | { color: string };
+
+export type Person = { id: string; name: string; email: string; avatar: Avatar };
 
 export type Message = {
   id: string;

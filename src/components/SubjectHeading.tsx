@@ -6,7 +6,7 @@ export function SubjectHeading({ subject, isTitle = false }: { subject: string; 
   const Tag = isTitle ? 'h1' : 'h2';
   return (
     <div className="flex items-center justify-between pl-14">
-      <Tag className="text-headline font-normal text-ink">{subject}</Tag>
+      <Tag className="font-google-sans text-headline font-normal text-ink">{subject}</Tag>
       {isTitle && (
         <div className="flex items-center gap-5">
           <Icon src={icons.print} />

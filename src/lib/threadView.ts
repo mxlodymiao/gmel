@@ -12,11 +12,20 @@ export type PreviewCard = {
   replyCount: number; // messages in that branch you can't see from here
 };
 
+export type MessageItem = { type: 'message'; entry: MessageEntry; initiallyExpanded: boolean };
+export type PreviewItem = { type: 'preview'; card: PreviewCard };
+
 export type ThreadItem =
-  | { type: 'message'; entry: MessageEntry; initiallyExpanded: boolean }
-  | { type: 'collapsedCount'; entries: MessageEntry[] }
+  | MessageItem
+  // What's folded into a count circle; key is the first hidden message's id
+  | { type: 'collapsedCount'; key: string; items: (MessageItem | PreviewItem)[] }
   | { type: 'subjectChange'; subject: string }
-  | { type: 'preview'; card: PreviewCard };
+  | PreviewItem;
+
+// The messages a count circle stands for (it can also hold a card)
+export function foldedMessages(items: (MessageItem | PreviewItem)[]): MessageEntry[] {
+  return items.flatMap((i) => (i.type === 'message' ? [i.entry] : []));
+}
 
 export type ThreadViewModel = {
   branchId: string;
@@ -34,13 +43,14 @@ function previewCard(branch: Branch, target: PreviewCard['target'], replyCount: 
 
 /**
  * Lays out one branch the way Gmail does, oldest at the top:
- * - First message, last two, and the message where a fork happens are visible;
- *   the last one is expanded.
+ * - First message and the last two are visible; the last one is expanded.
  * - Two or more messages in between are folded into a count circle.
  * - A heading appears above any message whose subject changed.
- * - Main view: a card for each side branch, right where it forked off.
+ * - Main view: a card for each side branch, right where it forked off. The
+ *   message it forked from always stays visible, so the card is never hidden.
  * - Side view: the main thread up to the fork, a card back to the main thread
- *   at the fork, then the side branch. Both views mirror each other.
+ *   at the fork, then the side branch. That earlier context folds away like any
+ *   older messages: a card is folded together with the message it forked from.
  */
 export function buildThreadView(thread: DerivedThread, branchId: string): ThreadViewModel {
   const { main, sides, branchOf } = thread;
@@ -63,32 +73,45 @@ export function buildThreadView(thread: DerivedThread, branchId: string): Thread
   // messages after the fork, since the side view already shows the ones before.
   const pendingCards =
     branch.kind === 'main'
-      ? sides.map((side) => ({ card: previewCard(side, 'side', side.messages.length), forkStart: side.messages[0] }))
+      ? sides.map((side) => ({
+          card: previewCard(side, 'side', side.messages.length),
+          forkStart: side.messages[0],
+          forkParentId: side.forkParentId,
+        }))
       : [
           {
             card: previewCard(main, 'main', main.messages.filter((m) => byTime(m, branch.messages[0]) > 0).length),
             forkStart: branch.messages[0],
+            forkParentId: branch.forkParentId,
           },
         ];
 
-  // Keep fork points visible so each card sits right under the message it forked from
-  const forkParentIds = (branch.kind === 'main' ? sides : [branch]).map((b) => b.forkParentId);
+  // In the main view, keep fork points visible so every "Open thread" card shows
+  const forkParentIds = branch.kind === 'main' ? sides.map((b) => b.forkParentId) : [];
   const visible = new Set([shown[0], ...shown.slice(-2), ...shown.filter((m) => forkParentIds.includes(m.id))]);
-  const hiddenCount = shown.length - visible.size;
+  // A single hidden message isn't worth a count circle, so only fold two or more
+  const folding = shown.length - visible.size >= 2;
+  const isFolded = (message: Message | undefined) => !!message && folding && !visible.has(message);
 
   const items: ThreadItem[] = [];
-  let pendingHidden: MessageEntry[] = [];
+  let pendingHidden: (MessageItem | PreviewItem)[] = [];
   const flushHidden = () => {
     if (pendingHidden.length === 0) return;
-    items.push({ type: 'collapsedCount', entries: pendingHidden });
+    const key = foldedMessages(pendingHidden)[0].message.id;
+    items.push({ type: 'collapsedCount', key, items: pendingHidden });
     pendingHidden = [];
   };
 
   let previousSubject = shown[0].subject;
   shown.forEach((message, index) => {
     while (pendingCards.length > 0 && byTime(pendingCards[0].forkStart, message) <= 0) {
-      flushHidden();
-      items.push({ type: 'preview', card: pendingCards.shift()!.card });
+      const { card, forkParentId } = pendingCards.shift()!;
+      if (isFolded(shown.find((m) => m.id === forkParentId))) {
+        pendingHidden.push({ type: 'preview', card });
+      } else {
+        flushHidden();
+        items.push({ type: 'preview', card });
+      }
     }
 
     if (message.subject !== previousSubject) {
@@ -102,9 +125,8 @@ export function buildThreadView(thread: DerivedThread, branchId: string): Thread
       chip: messageChip(message, branchById(branchOf[message.id]), main),
     };
 
-    // A single hidden message isn't worth a count circle, so just show it
-    if (!visible.has(message) && hiddenCount >= 2) {
-      pendingHidden.push(entry);
+    if (isFolded(message)) {
+      pendingHidden.push({ type: 'message', entry, initiallyExpanded: false });
     } else {
       flushHidden();
       items.push({ type: 'message', entry, initiallyExpanded: index === shown.length - 1 });

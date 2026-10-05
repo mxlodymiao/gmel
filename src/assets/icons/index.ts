@@ -4,6 +4,8 @@ import archive from './archive.svg';
 import arrowBack from './arrow-back.svg';
 import arrowDown from './arrow-down.svg';
 import arrowDropDown from './arrow-drop-down.svg';
+import arrowOutward from './arrow-outward.svg';
+import audienceChange from './audience-change.svg';
 import chevronLeft from './chevron-left.svg';
 import chevronRight from './chevron-right.svg';
 import countCircle from './count-circle.svg';
@@ -23,6 +25,7 @@ import labelDocs from './label-docs.svg';
 import labelFamily from './label-family.svg';
 import labelNewsletters from './label-newsletters.svg';
 import labelReconstruction from './label-reconstruction.svg';
+import lock from './lock.svg';
 import markUnread from './mark-unread.svg';
 import menu from './menu.svg';
 import mood from './mood.svg';
@@ -37,7 +40,9 @@ import search from './search.svg';
 import send from './send.svg';
 import settings from './settings.svg';
 import starEmpty from './star-empty.svg';
+import subjectChange from './subject-change.svg';
 import tune from './tune.svg';
+import users from './users.svg';
 
 export const icons = {
   add,
@@ -46,6 +51,8 @@ export const icons = {
   arrowBack,
   arrowDown,
   arrowDropDown,
+  arrowOutward,
+  audienceChange,
   chevronLeft,
   chevronRight,
   countCircle,
@@ -65,6 +72,7 @@ export const icons = {
   labelFamily,
   labelNewsletters,
   labelReconstruction,
+  lock,
   markUnread,
   menu,
   mood,
@@ -79,5 +87,7 @@ export const icons = {
   send,
   settings,
   starEmpty,
+  subjectChange,
   tune,
+  users,
 };
