@@ -31,7 +31,7 @@ export function ThreadSidebar({
     <aside
       aria-label="Activity"
       className={`flex shrink-0 flex-col overflow-x-hidden overflow-y-auto border-l border-divider transition-[width] duration-300 ease-in-out ${
-        collapsed ? 'w-16' : 'w-[300px]'
+        collapsed ? 'w-20' : 'w-[300px]'
       }`}
     >
       <div className={`pt-4 pb-4 transition-[padding] duration-300 ease-in-out ${collapsed ? 'px-2.5' : 'px-4'}`}>
@@ -53,7 +53,7 @@ export function ThreadSidebar({
 
       <ol
         id="activity-timeline"
-        className="px-4 pb-6"
+        className={`pb-6 transition-[padding] duration-300 ease-in-out ${collapsed ? 'px-6' : 'px-4'}`}
       >
         {timeline.map((item, i) => {
           const isLast = i === timeline.length - 1;
