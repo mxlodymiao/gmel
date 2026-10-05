@@ -1,0 +1,80 @@
+@import 'tailwindcss';
+
+/* Design tokens from the Figma frames. Spacing uses Tailwind's default 4px scale. */
+@theme {
+  --font-sans: 'Roboto', system-ui, sans-serif;
+  --font-display: 'Google Sans Flex', 'Roboto', sans-serif;
+
+  /* Surfaces */
+  --color-canvas: #f7f8fc;
+  --color-surface: #ffffff;
+  --color-search-field: #e9f1fb;
+  --color-compose: #c1e7fe;
+  --color-nav-active: #d3e2fd;
+  --color-chip-fill: #eff4f8;
+  --color-hover: #f2f5fa;
+
+  /* Text */
+  --color-ink: #1f1f1f;
+  --color-ink-nav: #202124;
+  --color-ink-active: #001d35;
+  --color-ink-button: #444746;
+  --color-muted: #5e5e5e;
+  --color-count: #5e6367;
+  --color-link: #4a85e7;
+
+  /* Lines */
+  --color-divider: #edeff1;
+  --color-toolbar-divider: #eceff1;
+  --color-button-border: #757575;
+
+  /* Type scale */
+  --text-headline: 22px;
+  --text-headline--line-height: 28px;
+  --text-logo: 20px;
+  --text-logo--line-height: 20px;
+  --text-logo--letter-spacing: 0.4px;
+  --text-search: 16px;
+  --text-search--line-height: 20px;
+  --text-search--letter-spacing: 0.16px;
+  --text-section: 16px;
+  --text-section--line-height: 24px;
+  --text-section--letter-spacing: 0.48px;
+  --text-body: 14px;
+  --text-body--line-height: 20px;
+  --text-body--letter-spacing: 0.28px;
+  --text-meta: 12px;
+  --text-meta--line-height: 18px;
+  --text-meta--letter-spacing: 0.18px;
+  --text-chip: 10px;
+  --text-chip--line-height: 18px;
+  --text-chip--letter-spacing: 0.15px;
+
+  /* Radii */
+  --radius-card: 16px;
+  --radius-chip: 8px;
+}
+
+body {
+  @apply bg-canvas font-sans text-ink antialiased;
+  margin: 0;
+}
+
+/* Keyboard focus outline for everything clickable */
+@utility focus-ring {
+  outline: none;
+  &:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+  }
+}
+
+/* Clickable message rows and headers. The padding gives the focus outline
+   room and is pulled back out with negative margins so the layout matches Figma. */
+@utility clickable-row {
+  width: calc(100% + 16px);
+  margin: -4px -8px;
+  padding: 4px 8px;
+  border-radius: var(--radius-chip);
+  cursor: pointer;
+}
