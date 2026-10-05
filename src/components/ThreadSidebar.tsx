@@ -108,7 +108,7 @@ function Track({ children, isLast }: { children?: ReactNode; isLast: boolean }) 
   return (
     <span className="flex w-8 shrink-0 flex-col items-center">
       {children}
-      {!isLast && <span className="w-0.5 flex-1 bg-line" />}
+      {!isLast && <span className="w-0.5 flex-1 bg-divider" />}
     </span>
   );
 }
@@ -199,17 +199,17 @@ function BranchNode({
   return (
     // Pulled up into the message above's bottom padding so the card sits close to it
     <li className="relative -mt-1 flex">
-      <span className="flex w-8 shrink-0 justify-center">{!isLast && <span className="w-0.5 bg-line" />}</span>
+      <span className="flex w-8 shrink-0 justify-center">{!isLast && <span className="w-0.5 bg-divider" />}</span>
       {/* Ends at the card's middle: half the row, less half the bottom padding */}
       <span
         aria-hidden
-        className="absolute top-0 left-[15px] h-[calc(50%-6px)] w-[33px] rounded-bl-[10px] border-b-2 border-l-2 border-line"
+        className="absolute top-0 left-[15px] h-[calc(50%-6px)] w-[33px] rounded-bl-[10px] border-b-2 border-l-2 border-divider"
       />
       <div className="ml-4 min-w-0 flex-1 pb-3">
         <button
           type="button"
           onClick={onOpen}
-          className="focus-ring flex w-full cursor-pointer items-start gap-2 rounded-card border-2 border-line bg-surface p-3 text-left transition-colors duration-300 ease-in-out hover:bg-card-hover"
+          className="focus-ring flex w-full cursor-pointer items-start gap-2 rounded-card border-2 border-divider bg-surface p-3 text-left transition-colors duration-300 ease-in-out hover:bg-card-hover"
         >
           <Avatar person={people[from]} size={28} />
           <span className="flex min-w-0 flex-1 flex-col items-start gap-1">
@@ -238,7 +238,7 @@ function ForkNode({ names, isLast, onOpen }: { names: string[]; isLast: boolean;
           onClick={onOpen}
           aria-label={label}
           title={label}
-          className="focus-ring flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-line bg-surface transition-colors duration-300 ease-in-out hover:bg-card-hover"
+          className="focus-ring flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-divider bg-surface transition-colors duration-300 ease-in-out hover:bg-card-hover"
         >
           <Icon src={icons.fork} size={16} />
         </button>
