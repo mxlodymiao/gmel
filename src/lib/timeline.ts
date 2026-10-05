@@ -1,5 +1,5 @@
 import { people } from '../data/thread';
-import type { Branch, DerivedThread, Message } from '../types';
+import type { DerivedThread, Message } from '../types';
 import { audienceOf } from './branches';
 import type { PreviewCard, ThreadViewModel } from './threadView';
 import { joinNames, namesFor } from './visibility';
@@ -72,9 +72,4 @@ export function buildTimeline(thread: DerivedThread, view: ThreadViewModel): Tim
         return []; // covered by the subject activity note
     }
   });
-}
-
-// Everyone on the current branch, in the order they first appear
-export function recipientsOf(branch: Branch): string[] {
-  return [...new Set(branch.messages.flatMap(audienceOf))];
 }

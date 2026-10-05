@@ -8,12 +8,14 @@ import arrowOutward from './arrow-outward.svg';
 import audienceChange from './audience-change.svg';
 import chevronLeft from './chevron-left.svg';
 import chevronRight from './chevron-right.svg';
+import collapsePanel from './collapse-panel.svg';
 import countCircle from './count-circle.svg';
 import deleteIcon from './delete.svg';
 import divider from './divider.svg';
 import draft from './draft.svg';
 import driveMove from './drive-move.svg';
 import edit from './edit.svg';
+import fork from './fork.svg';
 import forward from './forward.svg';
 import gemini from './gemini.svg';
 import help from './help.svg';
@@ -42,7 +44,6 @@ import settings from './settings.svg';
 import starEmpty from './star-empty.svg';
 import subjectChange from './subject-change.svg';
 import tune from './tune.svg';
-import users from './users.svg';
 
 export const icons = {
   add,
@@ -55,12 +56,14 @@ export const icons = {
   audienceChange,
   chevronLeft,
   chevronRight,
+  collapsePanel,
   countCircle,
   delete: deleteIcon,
   divider,
   draft,
   driveMove,
   edit,
+  fork,
   forward,
   gemini,
   help,
@@ -89,5 +92,4 @@ export const icons = {
   starEmpty,
   subjectChange,
   tune,
-  users,
 };

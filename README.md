@@ -11,7 +11,7 @@ The redesign adds:
 
 - **Visibility chips:** a gray pill next to a message saying who can see it, whenever that differs from the rest of the thread ("Private conversation with Bear", "Visible to Adam, Bear").
 - **Thread preview cards:** where a side conversation branches off, the main thread shows a card with its latest message, who it's visible to, and "Open thread (2 replies)". The side conversation shows a matching card at the same fork point to "Return to main thread (1 reply)".
-- **Activity sidebar:** the thread's recipients and a timeline of its path. The open thread is the main line, the other branch hangs off the fork, and small notes mark audience and subject changes. It stays in sync with the thread view.
+- **Activity sidebar:** a timeline of the thread's path. The open thread is the main line, the other branch hangs off the fork, and small notes mark audience and subject changes. It stays in sync with the thread view and collapses to a narrow rail of avatars and icons.
 
 Designs in Figma: [main thread](https://www.figma.com/design/BXWFPMzyfsbF2UGaJJ2LR2/Gmail-Mockup-2026-Auto-Layouted--Community-?node-id=4003-1800) · [side conversation](https://www.figma.com/design/BXWFPMzyfsbF2UGaJJ2LR2/Gmail-Mockup-2026-Auto-Layouted--Community-?node-id=4033-2977) · [sidebar, main](https://www.figma.com/design/BXWFPMzyfsbF2UGaJJ2LR2/Gmail-Mockup-2026-Auto-Layouted--Community-?node-id=4079-4676) · [sidebar, side](https://www.figma.com/design/BXWFPMzyfsbF2UGaJJ2LR2/Gmail-Mockup-2026-Auto-Layouted--Community-?node-id=4079-4784)
 
@@ -28,7 +28,7 @@ npm run build
 
 ## What's clickable
 
-Everything else (header, left navigation, toolbar, star/emoji/reply icons, Reply/Forward, recipients list) is static on purpose.
+Everything else (header, left navigation, toolbar, star/emoji/reply icons, Reply/Forward) is static on purpose.
 
 | Element | Action |
 | --- | --- |
@@ -37,7 +37,8 @@ Everything else (header, left navigation, toolbar, star/emoji/reply icons, Reply
 | Count circle ("2") | Reveal the hidden messages |
 | Thread preview card (anywhere on it) | Switch to the other thread |
 | Sidebar timeline message | Reveal it in the thread, open it, and scroll to it |
-| Sidebar branch card | Switch to that thread |
+| Sidebar branch card (or fork icon when collapsed) | Switch to that thread |
+| "Activity" title | Collapse or expand the activity sidebar |
 
 All of these are buttons: Tab to reach them, Enter or Space to activate. Switching threads moves keyboard focus to the card that leads back.
 
@@ -82,7 +83,7 @@ Messages are stored flat, each with a `parentId` and From/To/CC. Branches are ne
 - The open branch is the main line; the other branch is an indented card at the fork. Every message in the view is listed, including ones folded into a count.
 - Clicking a timeline message reveals it in the thread, opens it, and scrolls to it. `App` owns which messages are open and revealed, so both panels read the same state.
 - Notes come from comparing each message with the one it replies to: "Private conversation with Bear" when the audience narrows to you and one other person, "Adam added" / "Adam removed", and "Subject changed to …".
-- Recipients are everyone on the open branch (`recipientsOf`).
+- Clicking the "Activity" title collapses the panel to a 96px rail of avatars and activity icons, with a « button at the top to expand it again. The branch card becomes a fork icon on the line. Hovering an icon shows what it stands for.
 
 ## Design notes
 
@@ -99,7 +100,7 @@ src/
   lib/branches.ts       deriveBranches (the rules above)
   lib/threadView.ts     buildThreadView: one branch -> rows, counts, headings, cards
   lib/visibility.ts     chip rules and wording
-  lib/timeline.ts       buildTimeline and recipientsOf (activity sidebar)
+  lib/timeline.ts       buildTimeline (activity sidebar)
   lib/format.ts         dates and "to me, Bear"
   components/           AppShell, ThreadToolbar, ThreadView, MessageCollapsed,
                         MessageExpanded, CollapsedCount, VisibilityChip,

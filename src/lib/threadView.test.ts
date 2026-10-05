@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { messages } from '../data/thread';
 import { deriveBranches } from './branches';
 import { buildThreadView, foldedMessages, type PreviewCard, type ThreadViewModel } from './threadView';
-import { recipientsOf, buildTimeline } from './timeline';
+import { buildTimeline } from './timeline';
 import { chipText, joinNames } from './visibility';
 
 const cardLine = (card: PreviewCard) =>
@@ -88,10 +88,5 @@ describe('activity timeline', () => {
       '[subject] Subject changed to "[Approved] Website copy feedback"',
       'm7',
     ]);
-  });
-
-  it('lists everyone on the current branch', () => {
-    expect(recipientsOf(thread.main)).toEqual(['bear', 'me', 'adam']);
-    expect(recipientsOf(thread.sides[0])).toEqual(['bear', 'me', 'adam']);
   });
 });

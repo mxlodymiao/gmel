@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { icons } from '../assets/icons';
 import { people } from '../data/thread';
 import { formatShortDate } from '../lib/format';
@@ -9,75 +9,95 @@ import { Avatar } from './Avatar';
 import { Icon } from './Icon';
 
 /**
- * Right-hand panel: who's on the current thread, and a timeline of its messages.
- * The timeline follows the thread view: the open branch is the main line and the
- * other branch hangs off the fork.
+ * Right-hand activity panel: a timeline of the open thread. The open branch is
+ * the main line and the other branch hangs off the fork.
+ *
+ * Clicking the "Activity" title collapses it to a narrow rail of avatars and
+ * activity icons, with a fork icon standing in for the other branch and just
+ * the « button to expand it again. Hovering an icon shows what it stands for.
  */
 export function ThreadSidebar({
-  recipients,
   timeline,
   onJump,
   onOpenBranch,
 }: {
-  recipients: string[];
   timeline: TimelineItem[];
   onJump: (messageId: string) => void;
   onOpenBranch: (branchId: string) => void;
 }) {
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
     <aside
-      aria-label="Thread details"
-      className="flex w-[300px] shrink-0 flex-col overflow-y-auto border-l border-panel-border"
+      aria-label="Activity"
+      className={`flex shrink-0 flex-col overflow-x-hidden overflow-y-auto border-l border-panel-border transition-[width] duration-300 ease-in-out ${
+        collapsed ? 'w-24' : 'w-[300px]'
+      }`}
     >
-      <section className="flex flex-col gap-4 border-b border-panel-border p-4">
-        <div className="flex items-center gap-2">
-          <Icon src={icons.users} size={18} />
-          <h2 className="font-google-sans text-panel-title font-medium text-ink">Recipients ({recipients.length})</h2>
-        </div>
-        <ul className="flex flex-col gap-4">
-          {recipients.map((id) => (
-            <li key={id} className="flex items-center gap-3">
-              <Avatar person={people[id]} size={36} />
-              <div className="flex min-w-0 flex-col">
-                <span className="truncate text-body font-medium text-ink">{people[id].name}</span>
-                <span className="truncate text-label text-ink-soft">{people[id].email}</span>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <div className={`pt-4 pb-4 transition-[padding] duration-300 ease-in-out ${collapsed ? 'px-2.5' : 'px-4'}`}>
+        <button
+          type="button"
+          aria-expanded={!collapsed}
+          aria-controls="activity-timeline"
+          onClick={() => setCollapsed((c) => !c)}
+          className={`focus-ring flex w-full cursor-pointer items-center gap-1 rounded-chip whitespace-nowrap ${
+            collapsed ? 'justify-center' : 'justify-between'
+          }`}
+        >
+          {/* Hidden when collapsed, but still names the button for screen readers */}
+          <h2 className={collapsed ? 'sr-only' : 'font-google-sans text-panel-title font-medium text-ink'}>Activity</h2>
+          {/* » collapses toward the edge; flipped to « to expand again */}
+          <Icon src={icons.collapsePanel} size={20} className={collapsed ? 'rotate-180' : ''} />
+        </button>
+      </div>
 
-      <section className="flex flex-col gap-4 px-4 pt-4 pb-6">
-        <h2 className="font-google-sans text-panel-title font-medium text-ink">Activity</h2>
-        <ol>
-          {timeline.map((item, i) => {
-            const isLast = i === timeline.length - 1;
-            switch (item.type) {
-              case 'message':
-                return (
-                  <MessageNode
-                    key={item.message.id}
-                    message={item.message}
-                    isLast={isLast}
-                    onJump={() => onJump(item.message.id)}
-                  />
-                );
-              case 'activity':
-                return <ActivityNote key={`${item.kind}-${i}`} kind={item.kind} text={item.text} isLast={isLast} />;
-              case 'branch':
-                return (
-                  <BranchNode
-                    key={item.card.branchId}
-                    from={item.card.message.from}
-                    names={item.names}
-                    isLast={isLast}
-                    onOpen={() => onOpenBranch(item.card.branchId)}
-                  />
-                );
-            }
-          })}
-        </ol>
-      </section>
+      <ol
+        id="activity-timeline"
+        className={`pb-6 transition-[padding] duration-300 ease-in-out ${collapsed ? 'px-8' : 'px-4'}`}
+      >
+        {timeline.map((item, i) => {
+          const isLast = i === timeline.length - 1;
+          switch (item.type) {
+            case 'message':
+              return (
+                <MessageNode
+                  key={item.message.id}
+                  message={item.message}
+                  collapsed={collapsed}
+                  isLast={isLast}
+                  onJump={() => onJump(item.message.id)}
+                />
+              );
+            case 'activity':
+              return (
+                <ActivityNote
+                  key={`${item.kind}-${i}`}
+                  kind={item.kind}
+                  text={item.text}
+                  collapsed={collapsed}
+                  isLast={isLast}
+                />
+              );
+            case 'branch':
+              return collapsed ? (
+                <ForkNode
+                  key={item.card.branchId}
+                  names={item.names}
+                  isLast={isLast}
+                  onOpen={() => onOpenBranch(item.card.branchId)}
+                />
+              ) : (
+                <BranchNode
+                  key={item.card.branchId}
+                  from={item.card.message.from}
+                  names={item.names}
+                  isLast={isLast}
+                  onOpen={() => onOpenBranch(item.card.branchId)}
+                />
+              );
+          }
+        })}
+      </ol>
     </aside>
   );
 }
@@ -95,33 +115,39 @@ function Track({ children, isLast }: { children?: ReactNode; isLast: boolean }) 
 
 function MessageNode({
   message,
+  collapsed,
   isLast,
   onJump,
 }: {
   message: Message;
+  collapsed: boolean;
   isLast: boolean;
   onJump: () => void;
 }) {
   const sender = people[message.from];
+  const label = `${sender.name}, ${formatShortDate(message.sentAt)}`;
   return (
     <li>
       <button
         type="button"
         onClick={onJump}
         aria-label={`Go to ${sender.name}'s message, ${formatShortDate(message.sentAt)}`}
-        className="focus-ring flex min-h-[68px] w-full cursor-pointer gap-2.5 rounded-chip text-left"
+        title={collapsed ? label : undefined}
+        className={`focus-ring flex w-full cursor-pointer gap-2.5 rounded-chip text-left ${collapsed ? 'min-h-12' : 'min-h-[68px]'}`}
       >
         <Track isLast={isLast}>
           <Avatar person={sender} size={32} />
         </Track>
-        {/* Name and date share one bold style; the snippet sits under them in soft gray */}
-        <span className="flex min-w-0 flex-1 flex-col gap-1.5 pt-1.5 pb-5">
-          <span className="flex items-center justify-between gap-2 text-body font-semibold text-ink">
-            <span className="truncate">{sender.name}</span>
-            <span className="shrink-0">{formatShortDate(message.sentAt)}</span>
+        {!collapsed && (
+          // Name and date share one bold style; the snippet sits under them in soft gray
+          <span className="flex min-w-0 flex-1 flex-col gap-1.5 pt-1.5 pb-5">
+            <span className="flex items-center justify-between gap-2 text-body font-semibold text-ink">
+              <span className="truncate">{sender.name}</span>
+              <span className="shrink-0">{formatShortDate(message.sentAt)}</span>
+            </span>
+            <span className="truncate text-label text-ink-soft">{message.body}</span>
           </span>
-          <span className="truncate text-label text-ink-soft">{message.body}</span>
-        </span>
+        )}
       </button>
     </li>
   );
@@ -134,16 +160,26 @@ const activityIcons: Record<ActivityKind, string> = {
 };
 
 // A small note on the line, e.g. "Private conversation with Bear". The gap around the
-// icon breaks the line, as in the Figma.
-function ActivityNote({ kind, text, isLast }: { kind: ActivityKind; text: string; isLast: boolean }) {
+// icon breaks the line, as in the Figma. Collapsed, only the icon shows.
+function ActivityNote({
+  kind,
+  text,
+  collapsed,
+  isLast,
+}: {
+  kind: ActivityKind;
+  text: string;
+  collapsed: boolean;
+  isLast: boolean;
+}) {
   return (
-    <li className="flex min-h-10 gap-2.5">
+    <li className="flex min-h-10 gap-2.5" title={collapsed ? text : undefined}>
       <Track isLast={isLast}>
         <span className="py-1.5">
           <Icon src={activityIcons[kind]} size={14} />
         </span>
       </Track>
-      <span className="pt-1 pb-3 text-caption text-subtle">{text}</span>
+      <span className={collapsed ? 'sr-only' : 'pt-1 pb-3 text-caption text-subtle'}>{text}</span>
     </li>
   );
 }
@@ -186,6 +222,27 @@ function BranchNode({
           </span>
         </button>
       </div>
+    </li>
+  );
+}
+
+// Collapsed stand-in for the branch card: a fork icon on the line, same size as
+// an avatar, that still opens the other thread
+function ForkNode({ names, isLast, onOpen }: { names: string[]; isLast: boolean; onOpen: () => void }) {
+  const label = `Open thread with ${joinNames(names)}`;
+  return (
+    <li className="flex min-h-12">
+      <Track isLast={isLast}>
+        <button
+          type="button"
+          onClick={onOpen}
+          aria-label={label}
+          title={label}
+          className="focus-ring flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-2 border-line bg-surface transition-colors duration-300 ease-in-out hover:bg-card-hover"
+        >
+          <Icon src={icons.fork} size={16} />
+        </button>
+      </Track>
     </li>
   );
 }

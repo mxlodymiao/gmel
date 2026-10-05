@@ -6,7 +6,7 @@ import { ThreadToolbar } from './components/ThreadToolbar';
 import { ThreadView } from './components/ThreadView';
 import { messages } from './data/thread';
 import { deriveBranches } from './lib/branches';
-import { buildTimeline, recipientsOf } from './lib/timeline';
+import { buildTimeline } from './lib/timeline';
 import { buildThreadView, type ThreadViewModel } from './lib/threadView';
 
 // Which messages are open and which count circles are revealed, for one view
@@ -66,15 +66,12 @@ export default function App() {
     pendingJump.current = id;
   };
 
-  const branch = branchId === thread.main.id ? thread.main : thread.sides.find((b) => b.id === branchId)!;
-
   return (
     <AppShell
       toolbar={<ThreadToolbar />}
       scrollRef={scrollRef}
       sidebar={
         <ThreadSidebar
-          recipients={recipientsOf(branch)}
           timeline={buildTimeline(thread, view)}
           onJump={jumpTo}
           onOpenBranch={openBranch}
