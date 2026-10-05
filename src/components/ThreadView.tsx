@@ -76,10 +76,11 @@ export function ThreadView({
   const isMessage = (row: Row | undefined) => row?.type === 'message';
 
   // A rule goes around open messages, between messages revealed from a count
-  // (and their neighbors), and before a subject change
+  // (and their neighbors), after a preview card, and before a subject change
   const dividerBefore = (prev: Row | undefined, row: Row) => {
     if (!prev || prev.type === 'subjectChange') return false;
     if (row.type === 'subjectChange' || isOpen(prev) || isOpen(row)) return true;
+    if (prev.type === 'preview' && isMessage(row)) return true;
     return isMessage(prev) && isMessage(row) && (wasHidden(prev) || wasHidden(row));
   };
 
