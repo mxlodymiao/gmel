@@ -13,8 +13,6 @@ The redesign adds:
 - **Thread preview cards:** where a side conversation branches off, the main thread shows a card with its latest message, who it's visible to, and "Open thread (2 replies)". The side conversation shows a matching card at the same fork point to "Return to main thread (1 reply)".
 - **Activity sidebar:** a timeline of the thread's path. The open thread is the main line, the other branch hangs off the fork, and small notes mark audience and subject changes. It stays in sync with the thread view and collapses to a narrow rail of avatars and icons.
 
-Designs in Figma: [main thread](https://www.figma.com/design/BXWFPMzyfsbF2UGaJJ2LR2/Gmail-Mockup-2026-Auto-Layouted--Community-?node-id=4003-1800) · [side conversation](https://www.figma.com/design/BXWFPMzyfsbF2UGaJJ2LR2/Gmail-Mockup-2026-Auto-Layouted--Community-?node-id=4033-2977) · [sidebar, main](https://www.figma.com/design/BXWFPMzyfsbF2UGaJJ2LR2/Gmail-Mockup-2026-Auto-Layouted--Community-?node-id=4079-4676) · [sidebar, side](https://www.figma.com/design/BXWFPMzyfsbF2UGaJJ2LR2/Gmail-Mockup-2026-Auto-Layouted--Community-?node-id=4079-4784)
-
 ## Setup
 
 Requires Node 20.19+.
